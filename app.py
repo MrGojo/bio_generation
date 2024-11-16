@@ -4,7 +4,11 @@ import torch
 import os
 
 # Initialize the Flask app
+<<<<<<< HEAD
 app = Flask(_name_, template_folder='templates')
+=======
+app = Flask(__name__, template_folder='templates')
+>>>>>>> f9bcefa (Ready for deployment)
 
 # Load Hugging Face GPT-2 model and tokenizer
 model_name = "gpt2"  # You can use other variants like "gpt2-medium" for better results
@@ -297,5 +301,10 @@ def generate_bio():
     # Render the result page with the generated bio (or fallback message)
     return render_template('bio_result.html', bio=bio, error_message=error_message)
 
+<<<<<<< HEAD
 if _name_ == "_main_":
     app.run(debug=True)
+=======
+if __name__ == "__main__":
+    app.run(debug=True)
+>>>>>>> f9bcefa (Ready for deployment)
