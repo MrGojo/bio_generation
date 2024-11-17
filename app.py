@@ -6,6 +6,12 @@ model_name = "gpt2"  # You can use other variants like "gpt2-medium" for better 
 model = GPT2LMHeadModel.from_pretrained(model_name)
 tokenizer = GPT2Tokenizer.from_pretrained(model_name)
 
+# Predefined options for dropdowns
+career_options = ["Software Engineer", "Artist", "Entrepreneur"]
+personality_options = ["Adventurous", "Introverted", "Compassionate", "Creative"]
+interests_options = ["Cooking", "Music", "Sports", "Travel"]
+relationship_goals_options = ["Casual", "Long-term", "Seeking deep connection", "Adventurous"]
+
 # Predefined bios (could be expanded as needed)
 predefined_bios = {
     ("colonel", "adventurous", "cooking", "casual"): "The Adventurous Colonel\n\n\"Adventurous colonel with a passion for cooking and exploring new flavors. Looking for a casual connection to share culinary experiences and thrilling stories from the battlefield.\"",
@@ -246,7 +252,6 @@ def generate_bio_with_huggingface(career, personality, interests, relationship_g
         bio = tokenizer.decode(outputs[0], skip_special_tokens=True)
         
         # Return bio in the correct format
-        # Example: "- **The Adventurous Colonel**\n\n\"Adventurous colonel with a passion for cooking and exploring new flavors. Looking for a casual connection to share culinary experiences and thrilling stories from the battlefield.\""
         title = f"The {personality.capitalize()} {career.capitalize()}"
         description = bio.strip().replace("\n", " ")
         return f"- **{title}**\n\n\"{description}\""
@@ -274,14 +279,14 @@ def generate_bio(career, personality, interests, relationship_goals):
     else:
         return generate_bio_with_huggingface(career, personality, interests, relationship_goals)
 
-# Create a Gradio interface
+# Create a Gradio interface with Dropdown inputs
 interface = gr.Interface(
     fn=generate_bio,
     inputs=[
-        gr.Textbox(label="Career", placeholder="e.g. software engineer, artist, entrepreneur"),
-        gr.Textbox(label="Personality", placeholder="e.g. Adventurous,introverted,compassionate"),
-        gr.Textbox(label="Interests", placeholder="e.g. Cooking,music,sports"),
-        gr.Textbox(label="Relationship Goals", placeholder="e.g. Casual, Long-term, Seeking deep connection"),
+        gr.Dropdown(label="Career", choices=career_options, value="Software Engineer"),  # Replaced 'default' with 'value'
+        gr.Dropdown(label="Personality", choices=personality_options, value="Adventurous"),  # Replaced 'default' with 'value'
+        gr.Dropdown(label="Interests", choices=interests_options, value="Cooking"),  # Replaced 'default' with 'value'
+        gr.Dropdown(label="Relationship Goals", choices=relationship_goals_options, value="Casual"),  # Replaced 'default' with 'value'
     ],
     outputs=gr.Textbox(label="Generated Bio")
 )
