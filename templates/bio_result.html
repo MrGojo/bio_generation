@@ -12,22 +12,23 @@
             font-family: Arial, sans-serif;
             background-color: #181818; /* Instagram dark background */
             color: white; /* Light text color */
-            position: relative; /* For the absolute positioning of the rings */
-            overflow: auto; /* Enable scrolling when content overflows */
-            min-height: 100vh; /* Ensure the body takes full screen height */
+            overflow: hidden; /* Prevent scrolling caused by animation */
+            min-height: 100vh; /* Full height for the page */
+            position: relative; /* For ring animation positioning */
         }
+
         /* Animated rings (background effect) */
         .ring {
             position: absolute;
-            width: 500px;
-            height: 500px;
+            width: 650px;
+            height: 650px;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: -1; /* Keep the rings behind the content */
             top: 50%; /* Center vertically */
             left: 50%; /* Center horizontally */
-            transform: translate(-50%, -50%); /* Correct positioning */
+            transform: translate(-50%, -50%);
         }
 
         .ring i {
@@ -70,17 +71,14 @@
         /* Main container styling */
         .container {
             max-width: 450px;
-            margin-top: 50px;
+            margin: 50px auto;
             background-color: #262626;
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            opacity: 0.7;
-            overflow-y: auto; /* Enable vertical scrolling */
-            max-height: 80vh; /* Set a maximum height for the container */
+            z-index: 1; /* Ensure it is above the animated background */
         }
-        
-        
+
         h1 {
             text-align: center;
             margin-bottom: 30px;
@@ -101,10 +99,15 @@
             font-family: 'Georgia', serif;
             line-height: 1.6;
             text-align: center;
-            max-height: 60vh; /* Add a maximum height for the bio container */
-            overflow-y: auto; /* Enable scrolling inside the bio container if content exceeds max height */
+            max-height: 60vh;
+            overflow-y: auto; /* Enable scrolling for long bios */
         }
-        
+
+        .copy-bio-btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
         .back-btn {
             display: block;
             width: 100%;
@@ -117,22 +120,6 @@
             font-size: 16px;
             text-align: center;
             margin-bottom: 15px;
-        }
-
-        .form-select {
-            background-color: #333333;
-            color: white;
-            border: 1px solid #444444;
-        }
-
-        .form-select:focus {
-            border-color: #0095F6;
-            box-shadow: 0 0 5px #0095F6;
-        }
-
-        .copy-bio-btn-container {
-            text-align: center;
-            margin-top: 20px;
         }
     </style>
 </head>
@@ -159,7 +146,9 @@
                 <p>{{ bio }}</p>
             </div>
             <!-- Copy Bio Button -->
-            <button class="btn btn-primary mt-3" onclick="copyBio()">Copy Bio</button>
+            <div class="copy-bio-btn-container">
+                <button class="btn btn-primary mt-3" onclick="copyBio()">Copy Bio</button>
+            </div>
         {% else %}
             <!-- Predefined bio in case of error -->
             <div class="bio-container">

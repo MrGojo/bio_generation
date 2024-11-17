@@ -1,14 +1,11 @@
-from flask import Flask, render_template, request
+import gradio as gr
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
-import torch
-
-# Initialize the Flask app
-app = Flask(__name__, template_folder='templates')
 
 # Load Hugging Face GPT-2 model and tokenizer
 model_name = "gpt2"  # You can use other variants like "gpt2-medium" for better results
 model = GPT2LMHeadModel.from_pretrained(model_name)
 tokenizer = GPT2Tokenizer.from_pretrained(model_name)
+
 # Predefined bios (could be expanded as needed)
 predefined_bios = {
  ("software engineer", "adventurous", "cooking", "casual"): "An adventurous Software Engineer who loves creating new art and trying new recipes in the kitchen. Looking for a casual relationship filled with exciting experiences and new flavors.",
@@ -232,6 +229,8 @@ predefined_bios = {
     ("entrepreneur", "compassionate", "music", "adventurous"): "A compassionate Entrepreneur who enjoys music and exploring new sounds. Looking for an adventurous partner who shares my love for music, creativity, and artistic expression.",
 }
 # Function to generate a bio using Hugging Face's GPT-2
+
+# Function to generate a bio using Hugging Face's GPT-2
 def generate_bio_with_huggingface(career, personality, interests, relationship_goals):
     try:
         # Prepare the input prompt
@@ -245,13 +244,10 @@ def generate_bio_with_huggingface(career, personality, interests, relationship_g
         
         # Decode the generated output and clean up the text
         bio = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        
-        # Return the generated bio
-        return bio, None
+        return bio
     except Exception as e:
         # Handle errors gracefully
-        print(f"Error: {e}")
-        return "Sorry, there was an error generating the bio. Please try again.", None
+        return f"Error: {str(e)}"
 
 # Function to get a predefined bio based on the inputs
 def get_predefined_bio(career, personality, interests, relationship_goals):
@@ -262,38 +258,28 @@ def get_predefined_bio(career, personality, interests, relationship_goals):
     relationship_goals = relationship_goals.strip().lower()
 
     # Look for a matching bio based on the combination of inputs
-    bio = predefined_bios.get((career, personality, interests, relationship_goals))
-    
-    if bio:
-        return bio
-    else:
-        return None
+    return predefined_bios.get((career, personality, interests, relationship_goals))
 
-# Route for the home page - where users input their preferences
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-# Route for generating the bio after form submission
-@app.route('/generate_bio', methods=['POST'])
-def generate_bio():
-    career = request.form['career']
-    personality = request.form['personality']
-    interests = request.form['interests']
-    relationship_goals = request.form['relationship_goals']
-
-    # First try to get a predefined bio
+# Function to return either a predefined or generated bio
+def generate_bio(career, personality, interests, relationship_goals):
     predefined_bio = get_predefined_bio(career, personality, interests, relationship_goals)
-    
     if predefined_bio:
-        bio = predefined_bio
-        error_message = None
+        return predefined_bio
     else:
-        # If no predefined bio exists, generate a bio using Hugging Face GPT-2
-        bio, error_message = generate_bio_with_huggingface(career, personality, interests, relationship_goals)
+        return generate_bio_with_huggingface(career, personality, interests, relationship_goals)
 
-    # Render the result page with the generated bio (or fallback message)
-    return render_template('bio_result.html', bio=bio, error_message=error_message)
+# Create a Gradio interface
+interface = gr.Interface(
+    fn=generate_bio,
+    inputs=[
+        gr.Textbox(label="Career"),
+        gr.Textbox(label="Personality"),
+        gr.Textbox(label="Interests"),
+        gr.Textbox(label="Relationship Goals"),
+    ],
+    outputs=gr.Textbox(label="Generated Bio")
+)
 
+# Launch the Gradio app
 if __name__ == "__main__":
-    app.run(debug=True)
+    interface.launch()

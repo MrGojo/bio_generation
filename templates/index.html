@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DinnerTonight Bio Generator</title>
-    <!-- Bootstrap CDN for styling (modern and responsive UI) -->
+    <title>Generate Your Bio</title>
+    <!-- Bootstrap CDN for styling -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         /* Instagram Dark Mode color scheme */
@@ -12,22 +12,23 @@
             font-family: Arial, sans-serif;
             background-color: #181818; /* Instagram dark background */
             color: white; /* Light text color */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             overflow: hidden; /* Prevent scrolling caused by animation */
+            min-height: 100vh; /* Full height for the page */
+            position: relative; /* For ring animation positioning */
         }
 
-        /* Ring animation styling */
+        /* Animated rings (background effect) */
         .ring {
             position: absolute;
-            width: 650px; /* Reduced size */
-            height: 650px; /* Reduced size */
+            width: 650px;
+            height: 650px;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 0; /* Behind the container */
+            z-index: -1; /* Keep the rings behind the content */
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%);
         }
 
         .ring i {
@@ -40,21 +41,22 @@
         .ring i:nth-child(1) {
             border-radius: 38% 62% 63% 37% / 41% 44% 56% 59%;
             animation: animate 6s linear infinite;
+            border-color: #00ff0a; /* Green */
+            box-shadow: 0 0 15px #00ff0a; /* Green glow */
         }
 
         .ring i:nth-child(2) {
             border-radius: 41% 44% 56% 59% / 38% 62% 63% 37%;
             animation: animate 4s linear infinite;
+            border-color: #ff0057; /* Pink */
+            box-shadow: 0 0 15px #ff0057; /* Pink glow */
         }
 
         .ring i:nth-child(3) {
             border-radius: 41% 44% 56% 59% / 38% 62% 63% 37%;
             animation: animate 10s linear infinite;
-        }
-
-        .ring:hover i {
-            border: 6px solid var(--clr);
-            filter: drop-shadow(0 0 20px var(--clr));
+            border-color: #d0ff00; /* Yellow */
+            box-shadow: 0 0 15px #d0ff00; /* Yellow glow */
         }
 
         @keyframes animate {
@@ -66,16 +68,15 @@
             }
         }
 
-        /* Container adjustments to layer above the animation */
+        /* Main container styling */
         .container {
-            position: relative;
-            z-index: 1; /* Place above the animated background */
-            max-width: 450px; /* Reduced width */
-            background-color: rgba(38, 38, 38, 0.5); /* Semi-transparent background for visibility */
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #262626;
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Shadow for depth */
-            text-align: center;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1; /* Ensure it is above the animated background */
         }
 
         h1 {
@@ -84,103 +85,84 @@
             color: #0095F6; /* Instagram-like blue for heading */
         }
 
-        .btn {
+        form {
+            margin-top: 20px;
+        }
+
+        .form-control, .form-select {
+            background-color: #333333;
+            color: white;
+            border: 1px solid #444444;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #0095F6;
+            box-shadow: 0 0 5px #0095F6;
+        }
+
+        .submit-btn {
+            display: block;
             width: 100%;
             margin-top: 20px;
-            background-color: #0095F6; /* Instagram's blue color for buttons */
-            color: white; /* Light text for buttons */
-            border: none;
-        }
-
-        .btn:hover {
-            background-color: #0078D4; /* Darker blue on hover */
-        }
-
-        .error-message {
-            color: red;
-            font-size: 16px;
             text-align: center;
-            margin-bottom: 15px;
         }
 
-        /* Styling for select dropdowns in dark mode */
-        .form-select {
-            background-color: #333333; /* Dark background for dropdowns */
-            color: white; /* Light text in dropdowns */
-            border: 1px solid #444444; /* Darker border for dropdowns */
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #bbbbbb;
         }
 
-        .form-select:focus {
-            border-color: #0095F6; /* Blue border on focus */
-            box-shadow: 0 0 5px #0095F6; /* Blue glow effect when focused */
+        .footer a {
+            color: #0095F6;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
-    <!-- Ring Animation -->
+    <!-- Animated rings (background effect) -->
     <div class="ring">
-        <i style="--clr:#00ff0a;"></i>
-        <i style="--clr:#ff0057;"></i>
-        <i style="--clr:#d0ff00;"></i>
+        <i></i>
+        <i></i>
+        <i></i>
     </div>
 
     <!-- Main container for the form -->
     <div class="container">
-        <h1>Create Your Bio</h1>
-        
-        <!-- Error message display if API quota is exceeded -->
+        <h1>Bio Generator</h1>
+
+        <!-- Display error message if there's an issue with the app -->
         {% if error_message %}
-            <div class="error-message">{{ error_message }}</div>
+            <div class="alert alert-danger" role="alert">
+                {{ error_message }}
+            </div>
         {% endif %}
 
-        <!-- Form to capture the user's preferences for generating their bio -->
+        <!-- Form to accept input for bio generation -->
         <form action="/generate_bio" method="POST">
-            <!-- Career dropdown selection -->
             <div class="mb-3">
-                <label for="career" class="form-label">Career</label>
-                <select class="form-select" id="career" name="career" required>
-                    <option value="Software Engineer">Software Engineer</option>
-                    <option value="Artist">Artist</option>
-                    <option value="Entrepreneur">Entrepreneur</option>
+                <label for="name" class="form-label">Your Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="mb-3">
+                <label for="profession" class="form-label">Your Profession</label>
+                <input type="text" class="form-control" id="profession" name="profession" required>
+            </div>
+            <div class="mb-3">
+                <label for="style" class="form-label">Select Bio Style</label>
+                <select class="form-select" id="style" name="style" required>
+                    <option value="professional">Professional</option>
+                    <option value="casual">Casual</option>
+                    <option value="funny">Funny</option>
                 </select>
             </div>
-
-            <!-- Personality dropdown selection -->
-            <div class="mb-3">
-                <label for="personality" class="form-label">Personality</label>
-                <select class="form-select" id="personality" name="personality" required>
-                    <option value="Adventurous">Adventurous</option>
-                    <option value="Creative">Creative</option>
-                    <option value="Compassionate">Compassionate</option>
-                    <option value="Introverted">Introverted</option>
-                </select>
-            </div>
-
-            <!-- Interests dropdown selection -->
-            <div class="mb-3">
-                <label for="interests" class="form-label">Interests</label>
-                <select class="form-select" id="interests" name="interests" required>
-                    <option value="Cooking">Cooking</option>
-                    <option value="Traveling">Traveling</option>
-                    <option value="Fitness">Fitness</option>
-                    <option value="Music">Music</option>
-                </select>
-            </div>
-
-            <!-- Relationship goals dropdown selection -->
-            <div class="mb-3">
-                <label for="relationship_goals" class="form-label">Relationship Goals</label>
-                <select class="form-select" id="relationship_goals" name="relationship_goals" required>
-                    <option value="Casual">Casual</option>
-                    <option value="Long-term">Long-term</option>
-                    <option value="Adventurous">Adventurous</option>
-                    <option value="Seeking Deep Connection">Seeking Deep Connection</option>
-                </select>
-            </div>
-
-            <!-- Submit button to generate the bio -->
-            <button type="submit" class="btn">Generate Bio</button>
+            <button type="submit" class="btn btn-primary submit-btn">Generate Bio</button>
         </form>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 Bio Generator. Made with <span style="color: red;">♥</span>. <a href="https://example.com" target="_blank">Learn More</a>.</p>
     </div>
 
     <!-- Bootstrap script for proper functioning of components -->
