@@ -228,7 +228,6 @@ predefined_bios = {
     ("entrepreneur", "compassionate", "music", "seeking deep connection"): "A compassionate Entrepreneur who is moved by music and creative expression. Looking for a deep connection with someone who shares my passion for music and emotional bonding.",
     ("entrepreneur", "compassionate", "music", "adventurous"): "A compassionate Entrepreneur who enjoys music and exploring new sounds. Looking for an adventurous partner who shares my love for music, creativity, and artistic expression.",
 }
-# Function to generate a bio using Hugging Face's GPT-2
 
 # Function to generate a bio using Hugging Face's GPT-2
 def generate_bio_with_huggingface(career, personality, interests, relationship_goals):
@@ -272,10 +271,10 @@ def generate_bio(career, personality, interests, relationship_goals):
 interface = gr.Interface(
     fn=generate_bio,
     inputs=[
-        gr.Textbox(label="Career"),
-        gr.Textbox(label="Personality"),
-        gr.Textbox(label="Interests"),
-        gr.Textbox(label="Relationship Goals"),
+        gr.Textbox(label="Career", placeholder="e.g. Software Engineer"),
+        gr.Textbox(label="Personality", placeholder="e.g. Adventurous"),
+        gr.Textbox(label="Interests", placeholder="e.g. Cooking"),
+        gr.Textbox(label="Relationship Goals", placeholder="e.g. Casual, Long-term, Seeking deep connection"),
     ],
     outputs=gr.Textbox(label="Generated Bio")
 )
