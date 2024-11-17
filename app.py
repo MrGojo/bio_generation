@@ -8,6 +8,7 @@ tokenizer = GPT2Tokenizer.from_pretrained(model_name)
 
 # Predefined bios (could be expanded as needed)
 predefined_bios = {
+    ("colonel", "adventurous", "cooking", "casual"): "The Adventurous Colonel\n\n\"Adventurous colonel with a passion for cooking and exploring new flavors. Looking for a casual connection to share culinary experiences and thrilling stories from the battlefield.\"",
  ("software engineer", "adventurous", "cooking", "casual"): "An adventurous Software Engineer who loves creating new art and trying new recipes in the kitchen. Looking for a casual relationship filled with exciting experiences and new flavors.",
     ("software engineer", "adventurous", "cooking", "long-term"): "An adventurous Software Engineer with a love for cooking, always exploring new recipes and experiences. Seeking a long-term connection with someone who shares a passion for discovery and creativity.",
     ("software engineer", "adventurous", "cooking", "seeking deep connection"): "An adventurous Software Engineer who finds joy in cooking and experimenting with flavors. Seeking a deep connection with someone who appreciates the thrill of new culinary adventures and personal growth.",
@@ -233,7 +234,7 @@ predefined_bios = {
 def generate_bio_with_huggingface(career, personality, interests, relationship_goals):
     try:
         # Prepare the input prompt
-        prompt = f"Create a bio for a {personality} {career} who enjoys {interests} and is looking for {relationship_goals}."
+        prompt = f"Create a bio for an {personality} {career} who enjoys {interests} and is looking for {relationship_goals}. Include a creative title and bio description."
         
         # Tokenize the input prompt
         inputs = tokenizer.encode(prompt, return_tensors="pt")
@@ -243,7 +244,12 @@ def generate_bio_with_huggingface(career, personality, interests, relationship_g
         
         # Decode the generated output and clean up the text
         bio = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        return bio
+        
+        # Return bio in the correct format
+        # Example: "- **The Adventurous Colonel**\n\n\"Adventurous colonel with a passion for cooking and exploring new flavors. Looking for a casual connection to share culinary experiences and thrilling stories from the battlefield.\""
+        title = f"The {personality.capitalize()} {career.capitalize()}"
+        description = bio.strip().replace("\n", " ")
+        return f"- **{title}**\n\n\"{description}\""
     except Exception as e:
         # Handle errors gracefully
         return f"Error: {str(e)}"
@@ -263,6 +269,7 @@ def get_predefined_bio(career, personality, interests, relationship_goals):
 def generate_bio(career, personality, interests, relationship_goals):
     predefined_bio = get_predefined_bio(career, personality, interests, relationship_goals)
     if predefined_bio:
+        # Return the predefined bio directly without any additional explanation
         return predefined_bio
     else:
         return generate_bio_with_huggingface(career, personality, interests, relationship_goals)
@@ -271,9 +278,9 @@ def generate_bio(career, personality, interests, relationship_goals):
 interface = gr.Interface(
     fn=generate_bio,
     inputs=[
-        gr.Textbox(label="Career", placeholder="e.g. Software Engineer"),
-        gr.Textbox(label="Personality", placeholder="e.g. Adventurous"),
-        gr.Textbox(label="Interests", placeholder="e.g. Cooking"),
+        gr.Textbox(label="Career", placeholder="e.g. software engineer, artist, entrepreneur"),
+        gr.Textbox(label="Personality", placeholder="e.g. Adventurous,introverted,compassionate"),
+        gr.Textbox(label="Interests", placeholder="e.g. Cooking,music,sports"),
         gr.Textbox(label="Relationship Goals", placeholder="e.g. Casual, Long-term, Seeking deep connection"),
     ],
     outputs=gr.Textbox(label="Generated Bio")
